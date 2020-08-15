@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="./librerias/jquery/dist/jquery.min.js"></script>
+    <link rel="stylesheet" href="./librerias/boostrap/dist/css/bootstrap.min.css">
+    <script src="./librerias/boostrap/dist/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
+
+    <script src="./login.js"></script>
+    <title>Serval Transfer - Login</title>
+</head>
+<body style="background-color: rgb(219, 219, 219);">
+    <div class="content-fluid" style=" padding-top: 10%;">
+        <h2 align="center" style="position: fixed-top;">Gestor de Numeros Telefonicos</h2>
+        <div class="container" style="background-color: rgb(255, 255, 255); width: 90%; max-width: 500px; border-radius: 15px;padding-top: 10px;">
+            <h2>Iniciar Sesion</h2>
+            <div style="background-color: rgb(219, 219, 219);border-radius: 15px;">
+                <div style="padding: 7%;">
+                    <form id="formLogin" action="./principal.html">
+                        <br>
+                        <div class="row">
+                            <div class="col">
+                                <h4>Usuario</h4>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-1">
+                                <span class="fas fa-user"></span>
+                            </div>
+                            <div class="col">
+                                <input type="text" id="txtNombre" placeholder="Ingrese nombre de usuario" class="form-control">
+                            </div>
+                        </div>
+                        <br>
+                        <div class="row">
+                            <div class="col">
+                                <h4>Clave</h4>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-1">
+                                <span class="fas fa-key"></span>
+                            </div>
+                            <div class="col">
+                                <input type="password" id="txtClave" placeholder="Ingrese su clave" class="form-control">
+                            </div>
+                        </div>
+                        <br>
+                        <br>
+                        <div class="row">
+                            <div class="col-6">
+                                <input type="submit" id="btnSubmit" style="width: 100%;padding: 8%;" class="btn btn-success" value="Ingresar">
+                            </div>
+                            <div class="col-6">
+                                <input type="reset" style="width: 100%;padding: 8%;" class="btn btn-warning" value="Limpiar">
+                            </div>
+                        </div>
+                        <br>
+                    </form>
+                </div>
+            </div>
+            <label style="font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: grey; padding-top: 5px;">Carbone Software 2020</label>
+            <br>
+            <div id="divAlertas"></div>
+        </div>
+    </div>
+</body>
+</html>

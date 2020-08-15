@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="./librerias/jquery/dist/jquery.min.js"></script>
+    <link rel="stylesheet" href="./librerias/boostrap/dist/css/bootstrap.min.css">
+    <script src="./librerias/boostrap/dist/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
+
+    <script src="./principal.js"></script>
+    <title>Gestor de Numeros Telefonicos - HOME</title>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-md bg-dark nav-dark fixed-top">
+        <button class="navbar-toggler bg-light" type="button" data-toggle="collapse" id="btnMenu" data-target="#collapsibleNavbar">
+            <span class="fas fa-list"></span>
+            MENU
+            <!--img src="./logos/C blanco.png" width="50px" height="50px"-->
+            <!--div class="alert alert-warning">Se recomienda usar el dispositivo en horizontal</div-->
+        </button>
+        <div class="collapse navbar-collapse" id="collapsibleNavbar">
+            <ul class="navbar-nav">
+                <!--CERRAR SESION-->
+                <li class="dropdown dropdown" style="padding: 10px;">
+                    <button class="btn btn-danger" id="btnCerrarSesion"  data-toggle="dropdown">Cerrar Sesion</button>
+                </li>
+                <!--Lista de Telefonos-->
+                <li class="dropdown dropdown" style="padding: 10px;">
+                    <button class="btn btn-primary" id="btnResetLista" >
+                        Lista Completa
+                    </button>
+                </li>
+                <!--Agregar Telefono-->
+                <li class="dropdown dropdown" style="padding: 10px;">
+                    <button class="btn btn-success" id="btnAgregarTelefono" data-toggle="modal" data-target="#AltaModifi_modal">Agregar Telefono</button>
+                </li>
+                <!-- ORDENAR -->
+                <li class="nav-item dropdown" style="padding: 10px;">
+                    <!--Boton de ordenado-->
+                    <button class="btn btn-info" data-toggle="dropdown">Ordenar por...</button>
+                    <!--Opciones de ordenado-->
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item" id="btnOrdenarPorNumero" href="#">Numero</a>
+                        <a class="dropdown-item" id="btnOrdenarPorRevisita" href="#">Revisita</a>
+                        <a class="dropdown-item" id="btnOrdenarPorGrupo" href="#">Grupo</a>
+                        <a class="dropdown-item" id="btnOrdenarPorTerritorio" href="#">Territorio</a>
+                        <a class="dropdown-item" id="btnOrdenarPorFecha" href="#">Fecha de llamada</a>
+                    </div>
+                </li>
+
+
+                <!--Buscar telefono-->
+                <li class="dropdown dropdown" style="padding: 10px;">
+                    <button class="btn btn-primary" id="btnBuscar" data-toggle="modal" data-target="#AltaModifi_modal">
+                        <span class="fa fa-search"></span>
+                        Buscar
+                    </button>
+                </li>
+                <!-- Mas Opciones -->
+                <li class="nav-item dropdown" style="padding: 10px;">
+                    <!--Boton de Mas Opciones-->
+                    <button class="btn btn-secondary" data-toggle="dropdown">Mas opciones</button>
+                    <!--Opciones-->
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item" id="btnVerEventos" href="#">Ver Eventos</a>
+                        <a class="dropdown-item" id="btnEstadisticas" href="#" data-toggle="modal" data-target="#AltaModifi_modal">Estadisticas</a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        <h4 align="right" style="color: rgb(255, 255, 255); padding: 5px;">Gestor de Telefonos</h4>
+    </nav>
+    <div class="container-fluid" style="padding-top: 110px;">
+        <div id="divListaTelefonos"></div>
+        <!--VENTANA MODAL-->
+        <div class="modal fade" id="AltaModifi_modal">
+            <div class="modal-dialog">
+                <div class="modal-content" style="width: auto;">
+                    <div class="modal-header">
+                        <h4 class="modal-title text-primary" id="encabezadoModal">Agregar Telefono</h4>
+                    </div>
+                    <div class="modal-body" >
+                        <div id="divEstadisticas"></div>
+                        <form id="formTelefono">
+                            <!--Numero de telefono-->
+                            <div class="row">
+                                <div class="col-1">
+                                    <span class="fas fa-phone"></span>
+                                </div>
+                                <div class="col">
+                                    <input type="number" min="40000000" max="49999999" id="txtNumero" placeholder="Numero de telefono" class="form-control">
+                                </div>
+                            </div>
+                            <br>
+                            <!--Territorio-->
+                            <div class="row">
+                                <div class="col-1">
+                                    <span class="fas fa-map"></span>
+                                </div>
+                                <div class="col">
+                                    <input type="number" min="1" max="200" placeholder="Numero de territorio" id="txtTerritorio" class="form-control">
+                                </div>
+                            </div>
+                            <br>
+                            <!--Grupo-->
+                            <div class="row">
+                                <div class="col-1">
+                                    <span class="fas fa-users"></span>
+                                </div>
+                                <div class="col">
+                                    <input type="number" min="1" max="20" placeholder="Numero de grupo" id="txtGrupo" class="form-control">
+                                </div>
+                            </div>
+                            <br>
+                            <!--Revisita-->
+                            <div class="row">
+                                <div class="col-1">
+                                    <span class="fas fa-user"></span>
+                                </div>
+                                <div class="col">
+                                    <input type="text" placeholder="¿Quien realiza la revisita?" maxlength="30" id="txtRevisita" class="form-control">
+                                </div>
+                            </div>
+                            <br>
+                            <!--Fecha-->
+                            <div class="row">
+                                <div class="col-1">
+                                    <span class="fa fa-calendar"></span>
+                                </div>
+                                <div class="col">
+                                    <input type="number"  maxlength="2" value="0" placeholder="dia" min="0" max="31" id="txtDay" class="form-control">
+                                </div>
+                                <div class="col">
+                                    <input type="number"  maxlength="2" value="0" placeholder="mes" min="0" max="12" id="txtMonth" class="form-control">
+                                </div>
+                                <div class="col">
+                                    <input type="number"  maxlength="4" value="2020" placeholder="año" min="2019" max="2022" id="txtYear" class="form-control">
+                                </div>
+                            </div>
+                            <br>
+                            <!--Circunstancia-->
+                            <div class="row">
+                                <div class="col-1">
+                                    <span class="fas fa-list"></span>
+                                </div>
+                                <div class="col">
+                                    <select id="cboCircunstancia" class="form-control">
+                                        <option value="No Definida" selected>No Definida</option>
+                                        <option value="Nunca Antes Llamado">Nunca Antes Llamado</option>
+                                        <option value="Inconvenientes al Llamar">Inconvenientes Al Llamar</option>
+                                        <option value="Atendio">Atendio</option>
+                                        <option value="Corto">Corto</option>
+                                        <option value="No En Casa">No En Casa</option>
+                                        <option value="Contestador">Contestador</option>
+                                        <option value="Ocupado">Ocupado</option>
+                                        <option value="Negocios">Negocios</option>
+                                        <option value="No Llamar Mas">No Llamar Mas</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <br>
+                            <!--Descripcion-->
+                            <div class="row">
+                                <div class="col-1">
+                                    <span class="fas fa-pen"></span>
+                                </div>
+                                <div class="col">
+                                    <input type="text" id="txtDescripcion" maxlength="50" placeholder="Una breve descripcion..." class="form-control">
+                                </div>
+                            </div>
+                            <br>
+                            <div id="divAlertas">
+
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-primary" id="btnCancelarModal" data-dismiss="modal">Cancelar</button>
+                            <input type="button" class="btn btn-success" value="" id="btnAceptarModal">
+                            <button type="button" class="btn btn-warning" style="display: none;" id="btnCerrarModal" data-dismiss="modal">Cerrar</button>
+                            <input type="reset" id="btnReset" style="display: none;">
+                        </div>
+                    </form>             
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
