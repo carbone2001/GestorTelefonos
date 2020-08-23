@@ -126,7 +126,6 @@ function TraerListaTelefonos_localStorage() {
 //Prepara la ventana modal para realizar la modificacion
 function SetModificarTelefono(id) {
     var telefono = TraerTelefonoByID_localStorage(id);
-    //$("#cboCircunstancia").removeAttr("disabled");
     $("#txtDescripcion").removeAttr("readonly"); //Desabilito el campo de descripcion
     $("#encabezadoModal").html("Modificar Telefono"); //Cambio encabezado de la ventana modal
     //Seteo los campos de la ventana modal
@@ -154,8 +153,7 @@ function AceptarModal(id) {
             break;
     }
 }
-//ESTABLE (FUNCIONANDO!)
-function AgregarTelefono() {
+function ObtenerDatosFormJson() {
     var _a, _b, _c;
     var objJson = JSON.parse("{}");
     objJson.numero = parseInt((_a = $("#txtNumero").val().toString()) !== null && _a !== void 0 ? _a : "0");
@@ -174,16 +172,24 @@ function AgregarTelefono() {
     if (isNaN(parseInt($("#txtYear").val().toString())))
         anio = 0;
     objJson.ultimaVez = JSON.parse('{"dia":' + dia + ',"mes":' + mes + ',"anio":' + anio + '}');
+    return objJson;
+}
+function VerificarCamposInvalidos(objJson) {
     //Validaciones
     var camposInvalidos = new Array();
     if (objJson.numero < 40000000 || objJson.numero > 49999999 || isNaN(objJson.numero))
         camposInvalidos.push("numero (valor fuera de rango)");
-    if (objJson.territorio < 1 || objJson.territorio > 100 || isNaN(objJson.territorio))
+    if (objJson.territorio < 1 || objJson.territorio > 200 || isNaN(objJson.territorio))
         camposInvalidos.push("territorio (valor fuera de rango)");
     if (objJson.grupo < 1 || objJson.grupo > 20 || isNaN(objJson.grupo))
         camposInvalidos.push("grupo (valor fuera de rango)");
-    if (dia < 1 || dia > 31 || mes < 1 || mes > 12 || anio < 2019 || anio > 2022)
+    if (objJson.ultimaVez.dia < 1 || objJson.ultimaVez.dia > 31 || objJson.ultimaVez.mes < 1 || objJson.ultimaVez.mes > 12 || objJson.ultimaVez.anio < 2019 || objJson.ultimaVez.anio > 2022)
         camposInvalidos.push("fecha de ultima llamada (valores fuera de rango)");
+    return camposInvalidos;
+}
+function AgregarTelefono() {
+    var objJson = ObtenerDatosFormJson();
+    var camposInvalidos = VerificarCamposInvalidos(objJson);
     if (camposInvalidos.length == 0) {
         var strObjJson = JSON.stringify(objJson);
         $.ajax({
@@ -245,34 +251,8 @@ function EliminarTelefono(id) {
     }
 }
 function ModificarTelefono(id) {
-    var _a, _b, _c;
-    var objJson = TraerTelefonoByID_localStorage(id);
-    objJson.numero = parseInt((_a = $("#txtNumero").val().toString()) !== null && _a !== void 0 ? _a : "0");
-    objJson.revisita = $("#txtRevisita").val();
-    objJson.territorio = parseInt((_b = $("#txtTerritorio").val().toString()) !== null && _b !== void 0 ? _b : "0");
-    objJson.grupo = parseInt((_c = $("#txtGrupo").val().toString()) !== null && _c !== void 0 ? _c : "0");
-    objJson.descripcion = $("#txtDescripcion").val();
-    objJson.circunstancia = $("#cboCircunstancia").val();
-    var dia = parseInt($("#txtDay").val().toString());
-    var mes = parseInt($("#txtMonth").val().toString());
-    var anio = parseInt($("#txtYear").val().toString());
-    if (isNaN(parseInt($("#txtDay").val().toString())))
-        dia = 0;
-    if (isNaN(parseInt($("#txtMonth").val().toString())))
-        mes = 0;
-    if (isNaN(parseInt($("#txtYear").val().toString())))
-        anio = 0;
-    objJson.ultimaVez = JSON.parse('{"dia":' + dia + ',"mes":' + mes + ',"anio":' + anio + '}');
-    //Validaciones
-    var camposInvalidos = new Array();
-    if (objJson.numero < 40000000 || objJson.numero > 49999999 || isNaN(objJson.numero))
-        camposInvalidos.push("numero (valor fuera de rango)");
-    if (objJson.territorio < 1 || objJson.territorio > 100 || isNaN(objJson.territorio))
-        camposInvalidos.push("territorio (valor fuera de rango)");
-    if (objJson.grupo < 1 || objJson.grupo > 20 || isNaN(objJson.grupo))
-        camposInvalidos.push("grupo (valor fuera de rango)");
-    if (dia < 1 || dia > 31 || mes < 1 || mes > 12 || anio < 2019 || anio > 2022)
-        camposInvalidos.push("fecha de ultima llamada (valores fuera de rango)");
+    var objJson = ObtenerDatosFormJson();
+    var camposInvalidos = VerificarCamposInvalidos(objJson);
     if (camposInvalidos.length == 0) {
         var strObjJson = JSON.stringify(objJson);
         $.ajax({
@@ -282,7 +262,7 @@ function ModificarTelefono(id) {
             url: "./backend/modificar",
             headers: { "token": localStorage.getItem('jwt') },
             dataType: "json",
-            data: { "id_telefono": objJson.id, "obj_Json": strObjJson },
+            data: { "id_telefono": id, "obj_Json": strObjJson },
             cache: false,
             async: true
         })
@@ -304,11 +284,10 @@ function ModificarTelefono(id) {
         camposInvalidos.forEach(function (element) {
             mensajeError += ("<br> - " + element);
         });
-        Aviso(mensajeError + "<br>Vuelva a rellenar el formulario.");
+        Aviso(mensajeError);
     }
 }
 function BuscarTelefono(camposValidos_param, lsTelefonos_param) {
-    var _a, _b, _c;
     if (camposValidos_param === void 0) { camposValidos_param = undefined; }
     if (lsTelefonos_param === void 0) { lsTelefonos_param = undefined; }
     if (lsTelefonos_param == undefined) {
@@ -317,18 +296,9 @@ function BuscarTelefono(camposValidos_param, lsTelefonos_param) {
     else {
         var telefonos = lsTelefonos_param;
     }
-    if (camposValidos_param == undefined) //Si hay campos validos enviados como parametros...
+    if (camposValidos_param == undefined) //Si no hay campos validos enviados como parametros...
      {
-        var objJson = JSON.parse("{}");
-        objJson.numero = parseInt((_a = $("#txtNumero").val().toString()) !== null && _a !== void 0 ? _a : "40000000");
-        objJson.revisita = $("#txtRevisita").val();
-        objJson.territorio = parseInt((_b = $("#txtTerritorio").val().toString()) !== null && _b !== void 0 ? _b : "0");
-        objJson.grupo = parseInt((_c = $("#txtGrupo").val().toString()) !== null && _c !== void 0 ? _c : "0");
-        //objJson.descripcion = $("#txtDescripcion").val();
-        objJson.circunstancia = $("#cboCircunstancia").val();
-        var dia = parseInt($("#txtDay").val().toString());
-        var mes = parseInt($("#txtMonth").val().toString());
-        var anio = parseInt($("#txtYear").val().toString());
+        var objJson = ObtenerDatosFormJson();
         var telefonosValidos = JSON.parse("{}");
         //Buscar campos validos para la busqueda
         var camposValidos = { "numero": 0, "revisita": "invalido", "territorio": 0, "grupo": 0, "fecha": "invalido", "circunstancia": "invalido" };
@@ -345,9 +315,9 @@ function BuscarTelefono(camposValidos_param, lsTelefonos_param) {
         if (!isNaN(objJson.grupo))
             camposValidos["grupo"] = objJson.grupo;
         //Fecha Valida [4]
-        if (!isNaN(dia) || !isNaN(mes) || !isNaN(anio)) {
-            if (!(dia < 1 || dia > 31 || mes < 1 || mes > 12 || anio < 2019 || anio > 2022)) {
-                objJson.ultimaVez = JSON.parse('{"dia":' + dia + ',"mes":' + mes + ',"anio":' + anio + '}');
+        if (!isNaN(objJson.ultimaVez.dia) || !isNaN(objJson.ultimaVez.mes) || !isNaN(objJson.ultimaVez.anio)) {
+            if (!(objJson.ultimaVez.dia < 1 || objJson.ultimaVez.dia > 31 || objJson.ultimaVez.mes < 1 || objJson.ultimaVez.mes > 12 || objJson.ultimaVez.anio < 2019 || objJson.ultimaVez.anio > 2022)) {
+                objJson.ultimaVez = JSON.parse('{"dia":' + objJson.ultimaVez.dia + ',"mes":' + objJson.ultimaVez.mes + ',"anio":' + objJson.ultimaVez.anio + '}');
                 camposValidos["fecha"] = JSON.stringify(objJson.ultimaVez);
             }
         }
@@ -355,7 +325,7 @@ function BuscarTelefono(camposValidos_param, lsTelefonos_param) {
         if (objJson.circunstancia != "No Definida")
             camposValidos["circunstancia"] = objJson.circunstancia;
     }
-    else {
+    else { //Si hay...
         camposValidos = camposValidos_param;
     }
     //Buscar telefono/s segun los campos validos
@@ -390,34 +360,11 @@ function BuscarTelefono(camposValidos_param, lsTelefonos_param) {
         return elemet;
     });
     if (telefonosValidos.length != 0) {
-        //Muestro los elementos filtrados
-        var codigo = '<h4 id="encabezadoListado">Lista de Telefonos (Segun Busqueda)</h4><br>';
-        codigo += '<div class="container-fluid table-responsive">';
-        codigo += '<table class="table table-hover">';
-        codigo += '<tr><th>Modificar</th><th>Numero</th><th>Revisita</th><th>Circunstancia</th><th>Fecha de llamada</th><th>Territ.</th><th>Grupo</th><th>Descipcion</th><th>Eliminar</th></tr>';
-        telefonosValidos.forEach(function (element) {
-            codigo += '<tr ondblclick="RegistrarLlamada(' + element.id + ')">';
-            //BotonEliminar
-            codigo += '<td><input type="button" data-toggle="modal" data-target="#AltaModifi_modal" value="Modificar" class="btn btn-info"  onclick="SetModificarTelefono(' + element.id + ')"/></div></td>';
-            //DATOS
-            codigo += '<th>' + element.numero + '</th>';
-            codigo += '<td>' + element.revisita + '</td>';
-            codigo += '<td>' + element.circunstancia + '</td>';
-            codigo += '<td>' + JSON.parse(element.ultimaVez).dia + '/' + JSON.parse(element.ultimaVez).mes + '/' + JSON.parse(element.ultimaVez).anio + '</td>';
-            codigo += '<td>' + element.territorio + '</td>';
-            codigo += '<td>' + element.grupo + '</td>';
-            codigo += '<td>' + element.descripcion + '</td>';
-            //Botones eliminar
-            codigo += '<td><input type="button" value="Eliminar" class="btn btn-danger" onclick="EliminarTelefono(' + element.id + ')"/></div></td>';
-            codigo += "</tr>";
-        });
-        codigo += '</table>';
-        codigo += '</div>';
+        ActualizarListaTelefonoParametro(telefonosValidos, "Lista de Telefonos (Segun Resultado de Busqueda)");
     }
     else {
-        var codigo = '<h4 id="encabezadoListado">No se encontraron resultados...</h4><br>';
+        ActualizarListaTelefonoParametro(telefonosValidos, "No se han encontrado coincidencias");
     }
-    $("#divListaTelefonos").html(codigo);
     //Seteo las configuraciones de busqueda
     localStorage.setItem("configuracionDeBusqueda", JSON.stringify({ "busquedaReciente": "true", "camposValidos": JSON.stringify(camposValidos) }));
     $("#btnCerrarModal").click();
@@ -459,27 +406,34 @@ function RegistrarLlamada(id) {
 }
 function ActualizarListaTelefonoParametro(lsTelefonos, encabezadoListado) {
     var codigo = '<h4 id="encabezadoListado">' + encabezadoListado + '</h4><br>';
-    codigo += '<div class="container-fluid table-responsive">';
-    codigo += '<table class="table table-hover">';
-    codigo += '<tr><th>Modificar</th><th>Numero</th><th>Revisita</th><th>Circunstancia</th><th>Fecha de llamada</th><th>Territ.</th><th>Grupo</th><th>Descipcion</th><th>Eliminar</th></tr>';
-    lsTelefonos.forEach(function (element) {
-        codigo += '<tr ondblclick="RegistrarLlamada(' + element.id + ')">';
-        //BotonEliminar
-        codigo += '<td><input type="button" data-toggle="modal" data-target="#AltaModifi_modal" value="Modificar" class="btn btn-info"  onclick="SetModificarTelefono(' + element.id + ')"/></div></td>';
-        //DATOS
-        codigo += '<th>' + element.numero + '</th>';
-        codigo += '<td>' + element.revisita + '</td>';
-        codigo += '<td>' + element.circunstancia + '</td>';
-        codigo += '<td>' + JSON.parse(element.ultimaVez).dia + '/' + JSON.parse(element.ultimaVez).mes + '/' + JSON.parse(element.ultimaVez).anio + '</td>';
-        codigo += '<td>' + element.territorio + '</td>';
-        codigo += '<td>' + element.grupo + '</td>';
-        codigo += '<td>' + element.descripcion + '</td>';
-        //Botones eliminar
-        codigo += '<td><input type="button" value="Eliminar" class="btn btn-danger" onclick="EliminarTelefono(' + element.id + ')"/></div></td>';
-        codigo += "</tr>";
-    });
-    codigo += '</table>';
-    codigo += '</div>';
+    if (lsTelefonos.length != 0) {
+        codigo += '<div class="container-fluid table-responsive" style="background-color: rgb(231, 231, 231);border-radius: 25px;">';
+        codigo += '<table class="table table-hover">';
+        codigo += '<tr><th>Modificar</th><th>Numero</th><th>Revisita</th><th>Circunstancia</th><th>Fecha de llamada</th><th>Territ.</th><th>Grupo</th><th>Descipcion</th><th>Eliminar</th></tr>';
+        lsTelefonos.forEach(function (element) {
+            //style="border-top-left-radius: 20px; border-start-start-radius: 20px;"
+            codigo += '<tr ondblclick="RegistrarLlamada(' + element.id + ')" class="';
+            if (element.circunstancia == "No Llamar Mas") {
+                codigo += 'table-danger';
+            }
+            codigo += '">';
+            //Boton Modificar
+            codigo += '<td><input type="button" data-toggle="modal" data-target="#AltaModifi_modal" value="Modificar" class="btn btn-info"  onclick="SetModificarTelefono(' + element.id + ')"/></div></td>';
+            //DATOS
+            codigo += '<th>' + element.numero + '</th>';
+            codigo += '<td>' + element.revisita + '</td>';
+            codigo += '<td>' + element.circunstancia + '</td>';
+            codigo += '<td>' + JSON.parse(element.ultimaVez).dia + '/' + JSON.parse(element.ultimaVez).mes + '/' + JSON.parse(element.ultimaVez).anio + '</td>';
+            codigo += '<td>' + element.territorio + '</td>';
+            codigo += '<td>' + element.grupo + '</td>';
+            codigo += '<td>' + element.descripcion + '</td>';
+            //Botones eliminar
+            codigo += '<td><input type="button" value="Eliminar" class="btn btn-danger" onclick="EliminarTelefono(' + element.id + ')"/></div></td>';
+            codigo += "</tr>";
+        });
+        codigo += '</table>';
+        codigo += '</div>';
+    }
     $("#divListaTelefonos").html(codigo);
 }
 function OrdenarPorNumero_Ascendente() {
@@ -502,7 +456,6 @@ function OrdenarPorNumero_Ascendente() {
     else {
         ActualizarListaTelefonoParametro(lsTelefonos, "Listado de Telefonos (Segun Orden de Numeros Ascendente)");
     }
-    //localStorage.setItem("listadoTelefonos",lsTelefonos);
 }
 function OrdenarPorGrupo_Ascendente() {
     var lsTelefonos = TraerListaTelefonos_localStorage();
@@ -605,6 +558,39 @@ function VerEventos() {
             alert("No hay eventos aun...");
         }
         else {
+            var horarioSplitA;
+            var tiempoA;
+            var dateA;
+            var horarioSplitB;
+            var tiempoB;
+            var dateB;
+            respuesta = respuesta.sort(function (a, b) {
+                //anio-mes-dia h:m:s de A
+                horarioSplitA = a["horario"].split(" ");
+                tiempoA = JSON.parse("{}");
+                tiempoA.fechaA = horarioSplitA[0]; //andio-mes-fecha
+                tiempoA.horarioA = horarioSplitA[1]; //h:m:s
+                tiempoA.anio = (tiempoA.fechaA.split("-"))[0];
+                tiempoA.mes = (tiempoA.fechaA.split("-"))[1];
+                tiempoA.dia = (tiempoA.fechaA.split("-"))[2];
+                tiempoA.hora = (tiempoA.horarioA.split(":"))[0];
+                tiempoA.minuto = (tiempoA.horarioA.split(":"))[1];
+                tiempoA.segundo = (tiempoA.horarioA.split(":"))[2];
+                dateA = new Date(tiempoA.anio, tiempoA.mes, tiempoA.dia, tiempoA.hora, tiempoA.minuto, tiempoA.segundo);
+                //anio-mes-dia h:m:s de A
+                horarioSplitB = b["horario"].split(" ");
+                tiempoB = JSON.parse("{}");
+                tiempoB.fechaB = horarioSplitB[0]; //andio-mes-fecha
+                tiempoB.horarioB = horarioSplitB[1]; //h:m:s
+                tiempoB.anio = (tiempoB.fechaB.split("-"))[0];
+                tiempoB.mes = (tiempoB.fechaB.split("-"))[1];
+                tiempoB.dia = (tiempoB.fechaB.split("-"))[2];
+                tiempoB.hora = (tiempoB.horarioB.split(":"))[0];
+                tiempoB.minuto = (tiempoB.horarioB.split(":"))[1];
+                tiempoB.segundo = (tiempoB.horarioB.split(":"))[2];
+                dateB = new Date(tiempoB.anio, tiempoB.mes, tiempoB.dia, tiempoB.hora, tiempoB.minuto, tiempoB.segundo);
+                return (dateA - dateB) * (-1);
+            });
             var codigo = '<h4 id="encabezadoListado">LISTA DE EVENTOS</h4><br>';
             codigo += '<div class="container-fluid table-responsive">';
             codigo += '<table class="table table-hover">';
@@ -699,17 +685,48 @@ function MostrarEstadisticas() {
         var llamadaMasAntigua = JSON.parse(lsFechas[(lsFechas.length - 1)].ultimaVez);
         //Llamada mas reciente:
         var llamadaMasReciente = JSON.parse(lsFechas[0].ultimaVez);
+        //Numeros por grupo.
+        var lsGrupos = lsTelefonos.reduce(function (anterior, actual) {
+            //Verifico si el grupo existe en el array
+            var existe = false;
+            anterior.forEach(function (element) {
+                if (element.grupo == actual.grupo) {
+                    element.cantidad++;
+                    existe = true;
+                }
+            });
+            if (existe == false) {
+                anterior.push(JSON.parse('{"grupo":' + actual.grupo + ',"cantidad":1}'));
+            }
+            return anterior;
+        }, JSON.parse("[]")).sort(function (a, b) {
+            if (a.grupo > b.grupo) {
+                return 1;
+            }
+            if (a.grupo < b.grupo) {
+                return -1;
+            }
+            return 0;
+        });
         //Escribo el codigo que ira en la ventana modal
-        codigo += "<h5>Cantidad de Numeros: " + cantNumeros + "</h5><br>";
-        codigo += "<h5>Cantidad de Revisitas: " + cantRevisitas + "</h5><br>";
-        codigo += "<h5>Cantidad de No En Casa: " + cantNC + "</h5><br>";
-        codigo += "<h5>Cantidad de Nunca Antes Llamado: " + cantNuncaLlamado + "</h5><br>";
-        codigo += "<h5>Cantidad de Ocupados: " + cantOcupado + "</h5><br>";
-        codigo += "<h5>Cantidad de Contestador: " + cantContestador + "</h5><br>";
-        codigo += "<h5>Cantidad de No Llamar Mas: " + cantNoLlamarMas + "</h5><br>";
-        codigo += "<h5>Cantidad de Negocios: " + cantNegocios + "</h5><br>";
-        codigo += "<h5>Llamada mas Antigua: " + llamadaMasAntigua.dia + '/' + llamadaMasAntigua.mes + '/' + llamadaMasAntigua.anio + "</h5><br>";
-        codigo += "<h5>Llamada Mas Reciente: " + llamadaMasReciente.dia + '/' + llamadaMasReciente.mes + '/' + llamadaMasReciente.anio + "</h5><br>";
+        codigo += '<div class="container table-responsive">';
+        codigo += '<table>';
+        codigo += "<tr><td>Cantidad de Numeros: " + cantNumeros + "</td></tr>";
+        codigo += "<tr><td>Cantidad de Revisitas: " + cantRevisitas + "</td></tr>";
+        codigo += "<tr><td>Cantidad de No En Casa: " + cantNC + "</td></tr>";
+        codigo += "<tr><td>Cantidad de Nunca Antes Llamado: " + cantNuncaLlamado + "</td></tr>";
+        codigo += "<tr><td>Cantidad de Ocupados: " + cantOcupado + "</td></tr>";
+        codigo += "<tr><td>Cantidad de Contestador: " + cantContestador + "</td></tr>";
+        codigo += "<tr><td>Cantidad de No Llamar Mas: " + cantNoLlamarMas + "</td></tr>";
+        codigo += "<tr><td>Cantidad de Negocios: " + cantNegocios + "</td></tr>";
+        codigo += "<tr><td>Llamada mas Antigua: " + llamadaMasAntigua.dia + '/' + llamadaMasAntigua.mes + '/' + llamadaMasAntigua.anio + "</td></tr>";
+        codigo += "<tr><td>Llamada Mas Reciente: " + llamadaMasReciente.dia + '/' + llamadaMasReciente.mes + '/' + llamadaMasReciente.anio + "</td></tr>";
+        codigo += "<tr><th>Cantidad de Telefonos por Grupo</th><tr>";
+        lsGrupos.forEach(function (element) {
+            codigo += '<tr><td>Grupo: ' + element.grupo + ' | Cantidad de Telefonos: ' + element.cantidad + '</td></tr>';
+        });
+        codigo += "</table>";
+        codigo += '</div>';
     }
     $("#divEstadisticas").html(codigo);
     $("#btnAceptarModal").attr("style", "display:none;"); //Oculto el boton aceptar modal

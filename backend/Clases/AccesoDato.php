@@ -8,7 +8,7 @@ class AccesoDato
     {
         try
         {
-            $confSql = 'mysql:host=localhost;dbname=predicaciontelefonica_bd;charset=utf8';
+            $confSql = 'mysql:host=localhost;dbname=id14589427_predicaciontelefonica_bd;charset=utf8';
             $this->pdo = new PDO($confSql,"root","");
             //$this->pdo = new PDO($confSql,"usrenc01gt","1082020pass");
         }

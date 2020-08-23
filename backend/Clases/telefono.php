@@ -140,7 +140,7 @@ class Telefono
     function InsertarTelefonoPDO()
     {
         $pdo = AccesoDato::ObtenerAccesoDato();
-        $consulta = $pdo->ObtenerConsulta("INSERT into telefono(numero,revisita,circunstancia,grupo,territorio,ultimaVez,descripcion)values(:numero,:revisita,:circunstancia,:grupo,:territorio,:ultimaVez,:descripcion)");
+        $consulta = $pdo->ObtenerConsulta("INSERT into telefono(numero,ultimaVez,territorio,grupo,circunstancia,revisita,descripcion)values(:numero,:ultimaVez,:territorio,:grupo,:circunstancia,:revisita,:descripcion)");
         $consulta->bindValue(':numero',$this->numero,PDO::PARAM_INT);
         $consulta->bindValue(':revisita',$this->revisita,PDO::PARAM_STR);
         $consulta->bindValue(':circunstancia',$this->circunstancia,PDO::PARAM_STR);
